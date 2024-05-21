@@ -103,10 +103,10 @@
                     movendo: false
                 };
 
-                nave.imagens.cima.src = "/images/nave.cima.png";
-                nave.imagens.baixo.src = "/images/nave.baixo.png";
-                nave.imagens.esquerda.src = "/images/nave.esquerda.png";
-                nave.imagens.direita.src = "/images/nave.direita.png";
+                nave.imagens.cima.src = "images/nave.cima.png";
+                nave.imagens.baixo.src = "images/nave.baixo.png";
+                nave.imagens.esquerda.src = "images/nave.esquerda.png";
+                nave.imagens.direita.src = "images/nave.direita.png";
             }
 
             inicializarNave();
@@ -174,8 +174,8 @@
 
             // asteroides
             var tiposAsteroides = [
-                { src: "/images/asteroide.grande.png", largura: 80, altura: 80 },
-                { src: "/images/asteroide.pequeno.png", largura: 40, altura: 40 }
+                { src: "images/asteroide.grande.png", largura: 80, altura: 80 },
+                { src: "images/asteroide.pequeno.png", largura: 40, altura: 40 }
             ];
 
 
@@ -321,7 +321,7 @@
             document.getElementById('gameOverMessage').addEventListener('click', iniciarJogo);
         };
 
-        imagemFundo.src = "/images/background.jpg";
+        imagemFundo.src = "images/background.jpg";
     </script>
 </body>
 </html>
