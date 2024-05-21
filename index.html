@@ -89,8 +89,8 @@
                 nave = {
                     x: larguraCanvas / 2,
                     y: alturaCanvas / 2,
-                    largura: 30,
-                    altura: 30,
+                    largura: 20,
+                    altura: 20,
                     velocidade: 8,
                     direcao: 'cima',
                     imagens: {
@@ -280,16 +280,26 @@
                         frequenciaAsteroides -= 100;
                     }
                     ultimoTempoAjuste = tempo;
-                    if(velocidadeAsteroides < 15) {
-                        velocidadeAsteroides += 0.5;
-                    }
-                    
                 }
+
+                if (tempo % 10 === 0 && tempo !== 0 && tempo !== ultimoTempoAjuste) { 
+                    if(velocidadeAsteroides < 15) {
+                        velocidadeAsteroides += 1;
+                    }
+                }
+
                 if (tempo * 1000 - ultimoAsteroideTempo >= frequenciaAsteroides) {
                     criarAsteroide();
                     ultimoAsteroideTempo = tempo * 1000;
-                    setTimeout(criarAsteroide, 200); 
-                    setTimeout(criarAsteroide, 400);
+                    if(tempo > 10) {
+                        setTimeout(criarAsteroide, 200); 
+                    }
+                    if(tempo > 20){
+                        setTimeout(criarAsteroide, 400);
+                    }
+                    if(tempo > 30){
+                        setTimeout(criarAsteroide, 600);
+                    } 
                 }
 
             }
