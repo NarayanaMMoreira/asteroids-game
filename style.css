@@ -1,0 +1,64 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 1.02rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 700;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+    margin: 0;
+    background-color: black;
+}
+
+#canvasContainer {
+    position: relative;
+    width: 800px;
+    height: 400px;
+}
+
+#canvas {
+    border: 2px solid #8400c2; 
+    border-radius: 10px;
+    margin:  10px 0;
+}
+
+#startButton, #gameOverMessage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 25px;
+    border-radius: 30px;
+    background-color: #8400c2;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#startButton:hover, #gameOverMessage:hover {
+    background-color: white;
+    color: #8400c2;
+}
+
+#info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 10px;
+    background-color: #13007e;
+    color: white; 
+    flex-direction: row;
+    gap: 5rem;
+}
+
+#gameOverMessage {
+    display: none;
+}
+
+

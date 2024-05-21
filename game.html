@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Asteroides</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="canvasContainer">
+        <canvas id="canvas"></canvas>
+        <div id="info">
+            <div>Tempo: <span id="tempoDisplay">0s</span></div>
+            <div>Pontuação: <span id="pontuacaoDisplay">0</span></div>
+        </div>
+        <button id="startButton">Iniciar Jogo</button>
+        <button id="gameOverMessage">Jogar novamente</button>
+    </div>
+
+    <script>
+        var larguraCanvas = 800;
+        var alturaCanvas = 400;
+        var tempo = 0;
+        var pontuacao = 0;
+        var intervaloTempo;
+        var ultimoMovimentoTempo = 0;
+        var jogoIniciado = false;
+        var asteroides = [];
+        var ultimoAsteroideTempo = 0;
+        var gameOver = false;
+        var nave;
+        var frequenciaAsteroides = 1000;
+        var ultimoTempoAjuste = 0;
+        var velocidadeAsteroides = 3;
+    
+
+        //tempo e pontuação
+        function iniciarTempo() {
+            intervaloTempo = setInterval(function() {
+                tempo++;
+                document.getElementById('tempoDisplay').innerText = tempo + 's';
+                atualizarPontuacao();
+
+            }, 1000);    
+        }
+
+        function pararTempo() {
+            clearInterval(intervaloTempo);
+        }
+
+        function pararPontos() {
+            clearInterval(pontuacao);
+        }
+
+        var ultimaPenalidadeTempo = 0;
+
+        //1 ponto por segundo
+        function atualizarPontuacao() {
+            if (tempo % 1 === 0) {
+                pontuacao++;
+                document.getElementById('pontuacaoDisplay').innerText = pontuacao;
+            }
+
+            //penalidade de 5 segundos parado
+            if (jogoIniciado && tempo - ultimoMovimentoTempo >= 5) {
+                if (tempo - ultimaPenalidadeTempo >= 5) {
+                    pontuacao -= 10;
+                    ultimaPenalidadeTempo = tempo;
+                    document.getElementById('pontuacaoDisplay').innerText = pontuacao;
+                }
+            }
+        }
+
+
+        //canvas
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+
+        canvas.width = larguraCanvas;
+        canvas.height = alturaCanvas;
+
+        var imagemFundo = new Image();
+        imagemFundo.onload = function() {
+            ctx.drawImage(imagemFundo, 0, 0, larguraCanvas, alturaCanvas);
+
+
+            //nave
+            function inicializarNave() {
+                nave = {
+                    x: larguraCanvas / 2,
+                    y: alturaCanvas / 2,
+                    largura: 30,
+                    altura: 30,
+                    velocidade: 8,
+                    direcao: 'cima',
+                    imagens: {
+                        cima: new Image(),
+                        baixo: new Image(),
+                        esquerda: new Image(),
+                        direita: new Image()
+                    },
+                    indiceImagem: 0,
+                    movendo: false
+                };
+
+                nave.imagens.cima.src = "/images/nave.cima.png";
+                nave.imagens.baixo.src = "/images/nave.baixo.png";
+                nave.imagens.esquerda.src = "/images/nave.esquerda.png";
+                nave.imagens.direita.src = "/images/nave.direita.png";
+            }
+
+            inicializarNave();
+
+            document.addEventListener('keydown', function(event) {
+                if (!gameOver) {
+                    nave.movendo = true; 
+                    ultimoMovimentoTempo = tempo; 
+
+                    switch (event.keyCode) {
+                        case 37: 
+                            nave.direcao = 'esquerda';
+                            break;
+                        case 38: 
+                            nave.direcao = 'cima';
+                            break;
+                        case 39: 
+                            nave.direcao = 'direita';
+                            break;
+                        case 40: 
+                            nave.direcao = 'baixo';
+                            break;
+                    }
+                }
+            });
+
+            document.addEventListener('keyup', function(event) {
+                nave.movendo = false; 
+            });
+
+            function movimentoNave() {
+                if (nave.movendo) {
+                    var novoX = nave.x;
+                    var novoY = nave.y;
+
+                    switch (nave.direcao) {
+                        case 'esquerda':
+                            novoX -= nave.velocidade;
+                            break;
+                        case 'cima':
+                            novoY -= nave.velocidade;
+                            break;
+                        case 'direita':
+                            novoX += nave.velocidade;
+                            break;
+                        case 'baixo':
+                            novoY += nave.velocidade;
+                            break;
+                    }
+
+                    if (novoX >= 0 && novoX + nave.largura <= larguraCanvas) {
+                        nave.x = novoX;
+                    }
+                    if (novoY >= 0 && novoY + nave.altura <= alturaCanvas) {
+                        nave.y = novoY;
+                    }
+
+                    nave.indiceImagem = (nave.indiceImagem + 1) % 4;
+                }
+            }
+
+            function desenharNave() {
+                ctx.drawImage(nave.imagens[nave.direcao], nave.x, nave.y);
+            }
+
+            // asteroides
+            var tiposAsteroides = [
+                { src: "/images/asteroide.grande.png", largura: 80, altura: 80 },
+                { src: "/images/asteroide.pequeno.png", largura: 40, altura: 40 }
+            ];
+
+
+            function verificarColisao(asteroide1, asteroide2) {
+                return !(
+                    asteroide1.x > asteroide2.x + asteroide2.largura ||
+                    asteroide1.x + asteroide1.largura < asteroide2.x ||
+                    asteroide1.y > asteroide2.y + asteroide2.altura ||
+                    asteroide1.y + asteroide1.altura < asteroide2.y
+                );
+            }
+
+
+            function criarAsteroide() {
+                var tipo = tiposAsteroides[Math.floor(Math.random() * tiposAsteroides.length)];
+                var asteroide = {
+                    x: Math.random() * (larguraCanvas - tipo.largura),
+                    y: -tipo.altura,
+                    largura: tipo.largura,
+                    altura: tipo.altura,
+                    velocidade: velocidadeAsteroides,
+                    imagem: new Image(),
+                    angulo: 0,
+                    velocidadeRotacao: (Math.random() - 0.5) * 0.02 
+                };
+                asteroide.imagem.src = tipo.src; 
+
+                var colisao;
+                do {
+                    colisao = false;
+                    for (var i = 0; i < asteroides.length; i++) {
+                        if (verificarColisao(asteroide, asteroides[i])) {
+                            asteroide.x = Math.random() * (larguraCanvas - tipo.largura);
+                            asteroide.y = -tipo.altura;
+                            colisao = true;
+                            break;
+                        }
+                    }
+                } while (colisao);
+
+                asteroides.push(asteroide);
+            }
+
+            
+            function verificarColisaoNave(asteroide, nave) {
+                return !(
+                    asteroide.x > nave.x + nave.largura ||
+                    asteroide.x + asteroide.largura < nave.x ||
+                    asteroide.y > nave.y + nave.altura ||
+                    asteroide.y + asteroide.altura < nave.y
+                );
+            }
+
+            function atualizarAsteroides() {
+                for (var i = asteroides.length - 1; i >= 0; i--) {
+                    asteroides[i].y += asteroides[i].velocidade;
+                    asteroides[i].angulo += asteroides[i].velocidadeRotacao;
+
+                    if (asteroides[i].y > alturaCanvas) {
+                        asteroides.splice(i, 1);
+                    }
+
+                    if (verificarColisaoNave(asteroides[i], nave)) {
+                        gameOver = true;
+                        pararTempo();
+                        pararPontos();
+                        document.getElementById('gameOverMessage').style.display = 'block';
+                        return;
+                    }
+                }
+            }
+
+            function desenharAsteroides() {
+                for (var i = 0; i < asteroides.length; i++) {
+                    ctx.save();
+                    ctx.translate(asteroides[i].x + asteroides[i].largura / 2, asteroides[i].y + asteroides[i].altura / 2);
+                    ctx.rotate(asteroides[i].angulo);
+                    ctx.drawImage(asteroides[i].imagem, -asteroides[i].largura / 2, -asteroides[i].altura / 2, asteroides[i].largura, asteroides[i].altura);
+                    ctx.restore();
+                }
+            }
+
+
+
+            //game loop lógica
+            function gameLoop() {
+                if (gameOver) {
+                    return;
+                }
+
+                ctx.clearRect(0, 0, larguraCanvas, alturaCanvas);
+                ctx.drawImage(imagemFundo, 0, 0, larguraCanvas, alturaCanvas);
+                movimentoNave();
+                desenharNave();
+                atualizarAsteroides();
+                desenharAsteroides();
+                requestAnimationFrame(gameLoop);
+
+                
+                if (tempo % 5 === 0 && tempo !== 0 && tempo !== ultimoTempoAjuste) { 
+                    if (frequenciaAsteroides > 50) {
+                        frequenciaAsteroides -= 100;
+                    }
+                    ultimoTempoAjuste = tempo;
+                    if(velocidadeAsteroides < 15) {
+                        velocidadeAsteroides += 0.5;
+                    }
+                    
+                }
+                if (tempo * 1000 - ultimoAsteroideTempo >= frequenciaAsteroides) {
+                    criarAsteroide();
+                    ultimoAsteroideTempo = tempo * 1000;
+                    setTimeout(criarAsteroide, 200); 
+                    setTimeout(criarAsteroide, 400);
+                }
+
+            }
+            
+
+            function iniciarJogo() {
+                tempo = 0;
+                pontuacao = 0;
+                asteroides = [];
+                jogoIniciado = true;
+                gameOver = false;
+                ultimoMovimentoTempo = 0;
+                ultimoAsteroideTempo = 0;
+                ultimaPenalidadeTempo = 0;
+                ultimoIncrementoTempo = 1
+                frequenciaAsteroides = 1000;
+                ultimoTempoAjuste = 0;
+                velocidadeAsteroides = 3;
+                inicializarNave();
+                document.getElementById('tempoDisplay').innerText = '0s';
+                document.getElementById('pontuacaoDisplay').innerText = '0';
+                document.getElementById('startButton').style.display = 'none';
+                document.getElementById('gameOverMessage').style.display = 'none';
+                iniciarTempo();
+                gameLoop();
+            }
+
+            document.getElementById('startButton').addEventListener('click', iniciarJogo);
+            document.getElementById('gameOverMessage').addEventListener('click', iniciarJogo);
+        };
+
+        imagemFundo.src = "/images/background.jpg";
+    </script>
+</body>
+</html>
