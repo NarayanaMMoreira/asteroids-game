@@ -89,8 +89,8 @@
                 nave = {
                     x: larguraCanvas / 2,
                     y: alturaCanvas / 2,
-                    largura: 20,
-                    altura: 20,
+                    largura: 10,
+                    altura: 10,
                     velocidade: 8,
                     direcao: 'cima',
                     imagens: {
@@ -174,8 +174,8 @@
 
             // asteroides
             var tiposAsteroides = [
-                { src: "images/asteroide.grande.png", largura: 80, altura: 80 },
-                { src: "images/asteroide.pequeno.png", largura: 40, altura: 40 }
+                { src: "images/asteroide.grande.png", largura: 70, altura: 70 },
+                { src: "images/asteroide.pequeno.png", largura: 30, altura: 30 }
             ];
 
 
@@ -275,17 +275,11 @@
                 requestAnimationFrame(gameLoop);
 
                 
-                if (tempo % 5 === 0 && tempo !== 0 && tempo !== ultimoTempoAjuste) { 
-                    if (frequenciaAsteroides > 50) {
-                        frequenciaAsteroides -= 100;
-                    }
-                    ultimoTempoAjuste = tempo;
-                }
-
-                if (tempo % 10 === 0 && tempo !== 0 && tempo !== ultimoTempoAjuste) { 
+                if (tempo % 10 == 0 && tempo !== 0 && tempo !== ultimoTempoAjuste) { 
                     if(velocidadeAsteroides < 15) {
                         velocidadeAsteroides += 1;
                     }
+                    ultimoTempoAjuste = tempo;
                 }
 
                 if (tempo * 1000 - ultimoAsteroideTempo >= frequenciaAsteroides) {
@@ -299,6 +293,12 @@
                     }
                     if(tempo > 30){
                         setTimeout(criarAsteroide, 600);
+                    } 
+                    if(tempo > 40){
+                        setTimeout(criarAsteroide, 800);
+                    } 
+                    if(tempo > 50){
+                        setTimeout(criarAsteroide, 1000);
                     } 
                 }
 
@@ -315,7 +315,6 @@
                 ultimoAsteroideTempo = 0;
                 ultimaPenalidadeTempo = 0;
                 ultimoIncrementoTempo = 1
-                frequenciaAsteroides = 1000;
                 ultimoTempoAjuste = 0;
                 velocidadeAsteroides = 3;
                 inicializarNave();
