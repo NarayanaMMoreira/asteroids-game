@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogo de Asteroides</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="images/asteroide.pequeno.png">
 </head>
 <body>
     <div id="canvasContainer">
@@ -54,10 +55,10 @@
 
         var ultimaPenalidadeTempo = 0;
 
-        //1 ponto por segundo
+        //pontos
         function atualizarPontuacao() {
-            if (tempo % 1 === 0) {
-                pontuacao++;
+            if (tempo % 5 == 0) {
+                pontuacao += 100;
                 document.getElementById('pontuacaoDisplay').innerText = pontuacao;
             }
 
